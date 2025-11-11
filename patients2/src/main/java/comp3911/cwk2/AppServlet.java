@@ -22,6 +22,8 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 @SuppressWarnings("serial")
 public class AppServlet extends HttpServlet {
 
