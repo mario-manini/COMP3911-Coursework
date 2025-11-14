@@ -114,18 +114,24 @@ public class AppServlet extends HttpServlet {
 
   private List<Record> searchResults(String surname) throws SQLException {
     List<Record> records = new ArrayList<>();
-    String query = String.format(SEARCH_QUERY, surname);
-    try (Statement stmt = database.createStatement()) {
-      ResultSet results = stmt.executeQuery(query);
-      while (results.next()) {
-        Record rec = new Record();
-        rec.setSurname(results.getString(2));
-        rec.setForename(results.getString(3));
-        rec.setAddress(results.getString(4));
-        rec.setDateOfBirth(results.getString(5));
-        rec.setDoctorId(results.getString(6));
-        rec.setDiagnosis(results.getString(7));
-        records.add(rec);
+    // if surname is empty reutrn empty list
+    if (surname == null) return 
+    {records;}
+    
+    String query = SEARCH_QUERY.replace("%s", "?");
+    try (java.sql.PreparedStatement pst = database.prepareStatement(query)) {
+      pst.setString(1, surname);
+      try (ResultSet results = pst.executeQuery()) {
+        while (results.next()) {
+          Record rec = new Record();
+          rec.setSurname(results.getString(2));
+          rec.setForename(results.getString(3));
+          rec.setAddress(results.getString(4));
+          rec.setDateOfBirth(results.getString(5));
+          rec.setDoctorId(results.getString(6));
+          rec.setDiagnosis(results.getString(7));
+          records.add(rec);
+        }
       }
     }
     return records;
