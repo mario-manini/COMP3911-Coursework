@@ -17,12 +17,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+//import javax.crypto.SecretKeyFactory;
+//import javax.crypto.spec.PBEKeySpec;
+//import java.security.SecureRandom;
+//import java.security.spec.InvalidKeySpecException;
+//import java.util.Base64;
+
+import org.mindrot.jbcrypt.BCrypt;
+
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SuppressWarnings("serial")
 public class AppServlet extends HttpServlet {
@@ -64,7 +70,7 @@ public class AppServlet extends HttpServlet {
 
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
-   throws ServletException, IOException {
+          throws ServletException, IOException {
     try {
       Template template = fm.getTemplate("login.html");
       template.process(null, response.getWriter());
@@ -78,8 +84,8 @@ public class AppServlet extends HttpServlet {
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
-   throws ServletException, IOException {
-     // Get form parameters
+          throws ServletException, IOException {
+    // Get form parameters
     String username = request.getParameter("username");
     String password = request.getParameter("password");
     String surname = request.getParameter("surname");
@@ -114,24 +120,18 @@ public class AppServlet extends HttpServlet {
 
   private List<Record> searchResults(String surname) throws SQLException {
     List<Record> records = new ArrayList<>();
-    // if surname is empty reutrn empty list
-    if (surname == null) return 
-    {records;}
-    
-    String query = SEARCH_QUERY.replace("%s", "?");
-    try (java.sql.PreparedStatement pst = database.prepareStatement(query)) {
-      pst.setString(1, surname);
-      try (ResultSet results = pst.executeQuery()) {
-        while (results.next()) {
-          Record rec = new Record();
-          rec.setSurname(results.getString(2));
-          rec.setForename(results.getString(3));
-          rec.setAddress(results.getString(4));
-          rec.setDateOfBirth(results.getString(5));
-          rec.setDoctorId(results.getString(6));
-          rec.setDiagnosis(results.getString(7));
-          records.add(rec);
-        }
+    String query = String.format(SEARCH_QUERY, surname);
+    try (Statement stmt = database.createStatement()) {
+      ResultSet results = stmt.executeQuery(query);
+      while (results.next()) {
+        Record rec = new Record();
+        rec.setSurname(results.getString(2));
+        rec.setForename(results.getString(3));
+        rec.setAddress(results.getString(4));
+        rec.setDateOfBirth(results.getString(5));
+        rec.setDoctorId(results.getString(6));
+        rec.setDiagnosis(results.getString(7));
+        records.add(rec);
       }
     }
     return records;
