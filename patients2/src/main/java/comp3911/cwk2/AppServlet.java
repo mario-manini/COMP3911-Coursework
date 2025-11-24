@@ -34,7 +34,7 @@ import freemarker.template.TemplateExceptionHandler;
 public class AppServlet extends HttpServlet {
 
   private static final String CONNECTION_URL = "jdbc:sqlite:db.sqlite3";
-  private static final String AUTH_QUERY = "select hashedPassword from user where username='%s'";
+  private static final String AUTH_QUERY = "select password from user where username='%s'";
   private static final String SEARCH_QUERY = "select * from patient where surname='%s' collate nocase";
 
   private final Configuration fm = new Configuration(Configuration.VERSION_2_3_28);
@@ -120,7 +120,7 @@ public class AppServlet extends HttpServlet {
         return false;
       }
       // get the stored hashed password from the DB
-      String storedHash = results.getString("hashedPassword");
+      String storedHash = results.getString("password");
       // compare plaintext input password with the stored hash
       return BCrypt.checkpw(password, storedHash);
     }
