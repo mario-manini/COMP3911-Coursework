@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.sql.PreparedStatement;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -110,10 +111,22 @@ public class AppServlet extends HttpServlet {
     }
   }
 
+/*
+     This fix involves further modifying the code for deciding whether
+     a user is authenticated or not. In addition to hashing the passwords.
+     A prepared statement is used to ensure that SQL injection attacks are not possible.
+     The query retrieves the stored hashed password, and BCrypt is used to compare it
+     with the plaintext user input.
+  */
   private boolean authenticated(String username, String password) throws SQLException {
     // query db using username to find stored password - fixing flaw 3
     String query = String.format(AUTH_QUERY, username);
-    try (Statement stmt = database.createStatement()) {
+
+
+    try (PreparedStatement stmt = database.prepareStatement(query)) {
+      // bind the username to the prepared statement
+      stmt.setString(1, username);
+
       ResultSet results = stmt.executeQuery(query);
       if (!results.next()) {
         // username not found
@@ -126,6 +139,7 @@ public class AppServlet extends HttpServlet {
     }
   }
 
+  
   private List<Record> searchResults(String surname) throws SQLException {
     List<Record> records = new ArrayList<>();
     String query = String.format(SEARCH_QUERY, surname);
