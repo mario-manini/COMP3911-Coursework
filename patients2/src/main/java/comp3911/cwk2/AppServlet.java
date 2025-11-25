@@ -18,12 +18,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-//import javax.crypto.SecretKeyFactory;
-//import javax.crypto.spec.PBEKeySpec;
-//import java.security.SecureRandom;
-//import java.security.spec.InvalidKeySpecException;
-//import java.util.Base64;
-
 import org.mindrot.jbcrypt.BCrypt;
 
 import freemarker.template.Configuration;
