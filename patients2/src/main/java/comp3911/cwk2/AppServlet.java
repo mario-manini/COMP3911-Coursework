@@ -30,6 +30,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import freemarker.core.HTMLOutputFormat; // We need to import the HTML format so that we can use it when specifying 
 
 @SuppressWarnings("serial")
 public class AppServlet extends HttpServlet {
@@ -54,6 +55,10 @@ public class AppServlet extends HttpServlet {
       fm.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
       fm.setLogTemplateExceptions(false);
       fm.setWrapUncheckedExceptions(true);
+
+      // XSS sanitization
+      fm.setOutputFormat(HTMLOutputFormat.INSTANCE); // Specify the output format so that FreeMaker can automatically escape HTML and JS tags
+      fm.setRecognizeStandardFileExtensions(true); // Allow FreeMaker to automatically recognize HTML type files as HTML and apply the XSS sanitization
     }
     catch (IOException error) {
       throw new ServletException(error.getMessage());
