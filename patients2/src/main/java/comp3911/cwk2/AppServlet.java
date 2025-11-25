@@ -140,9 +140,15 @@ public class AppServlet extends HttpServlet {
   }
 
   
-  private List<Record> searchResults(String surname) throws SQLException {
+   private List<Record> searchResults(String surname) throws SQLException {
     List<Record> records = new ArrayList<>();
-    String query = String.format(SEARCH_QUERY, surname);
+
+    // sanitize string by escaping quotes
+    String sanitizedSurname = surname.replace("'", "''");
+
+    // use sanitized string
+    String query = String.format(SEARCH_QUERY, sanitizedSurname);
+
     try (Statement stmt = database.createStatement()) {
       ResultSet results = stmt.executeQuery(query);
       while (results.next()) {
