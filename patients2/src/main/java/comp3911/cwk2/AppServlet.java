@@ -18,12 +18,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-//import javax.crypto.SecretKeyFactory;
-//import javax.crypto.spec.PBEKeySpec;
-//import java.security.SecureRandom;
-//import java.security.spec.InvalidKeySpecException;
-//import java.util.Base64;
-
+//library for hashing password
 import org.mindrot.jbcrypt.BCrypt;
 
 import freemarker.template.Configuration;
@@ -36,7 +31,7 @@ import freemarker.core.HTMLOutputFormat; // We need to import the HTML format so
 public class AppServlet extends HttpServlet {
 
   private static final String CONNECTION_URL = "jdbc:sqlite:db.sqlite3";
-  private static final String AUTH_QUERY = "select password from user where username='%s'";
+  private static final String AUTH_QUERY = "select password from user where username=?";
   private static final String SEARCH_QUERY = "select * from patient where surname='%s' collate nocase";
 
   private final Configuration fm = new Configuration(Configuration.VERSION_2_3_28);
@@ -127,12 +122,11 @@ public class AppServlet extends HttpServlet {
     // query db using username to find stored password - fixing flaw 3
     String query = String.format(AUTH_QUERY, username);
 
-
     try (PreparedStatement stmt = database.prepareStatement(query)) {
       // bind the username to the prepared statement
       stmt.setString(1, username);
 
-      ResultSet results = stmt.executeQuery(query);
+      ResultSet results = stmt.executeQuery();
       if (!results.next()) {
         // username not found
         return false;
